@@ -1,0 +1,94 @@
+package main
+
+import (
+	"context"
+	"os"
+	"os/signal"
+	"subscription-vault-service/internal/api/v1"
+	"subscription-vault-service/internal/clients/postgres"
+	gracefulterminator "subscription-vault-service/internal/graceful_terminator"
+	"subscription-vault-service/internal/logger"
+	secretprovider "subscription-vault-service/internal/secret_provider"
+	"subscription-vault-service/internal/service"
+	"subscription-vault-service/internal/supports"
+	"syscall"
+)
+
+const (
+	address                    = ":8080"
+	defaultSecretsDir          = "./secrets/"
+	defaultContainerSecretsDir = "/run/secrets/"
+)
+
+// @title           Subscription vault service
+// @version         1.0
+// @description     Service for managing subscriptions
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Maksim
+// @contact.url    https://github.com/hhullen
+// @contact.email  hhullen@gmail.com
+
+// @license.name  Creative Commons Attribution-NonCommercial 4.0 International Public License
+// @license.url   https://creativecommons.org/licenses/by-nc/4.0/deed.en
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+func main() {
+	ctx, cancelCtx := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancelCtx()
+
+	go func() {
+		<-ctx.Done()
+		gracefulterminator.Stop()
+	}()
+
+	apiLog := logger.NewLogger(os.Stdout, "API")
+	serviceLog := logger.NewLogger(os.Stdout, "SERVICE")
+	dbLog := logger.NewLogger(os.Stdout, "DB")
+	gracefulterminator.Add(func() {
+		apiLog.Stop()
+		serviceLog.Stop()
+		dbLog.Stop()
+	})
+
+	secretDir := defaultSecretsDir
+	if supports.IsInContainer() {
+		secretDir = defaultContainerSecretsDir
+	}
+
+	secrets := secretprovider.NewSecretProvider(secretDir)
+
+	dbConn, err := postgres.NewSQLConn(ctx, secrets)
+	if err != nil {
+		dbLog.FatalKV("connecting db", "error", err.Error())
+		return
+	}
+
+	gracefulterminator.Add(func() {
+		if err := dbConn.Close(); err != nil {
+			dbLog.ErrorKV("closing db", "error", err.Error())
+		}
+	})
+
+	db := postgres.NewClient(ctx, dbConn)
+
+	subsService := service.NewService(ctx, db, serviceLog)
+
+	apiService, err := api.NewAPI(ctx, address, subsService, secrets, apiLog)
+	if err != nil {
+		apiLog.FatalKV("creating api", "error", err.Error())
+		return
+	}
+
+	gracefulterminator.Add(func() {
+		if err := apiService.Stop(); err != nil {
+			serviceLog.ErrorKV("stopping API", "error", err.Error())
+		}
+	})
+
+	if apiService.StartListening() != nil {
+		apiLog.FatalKV("rinning api", "error", err.Error())
+		return
+	}
+}
