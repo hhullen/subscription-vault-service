@@ -11,7 +11,12 @@ import (
 )
 
 type Querier interface {
-	CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) (uuid.UUID, error)
+	CalculateSubscriptionsPrice(ctx context.Context, arg CalculateSubscriptionsPriceParams) (int64, error)
+	CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) error
+	DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) error
+	GetSubscription(ctx context.Context, arg GetSubscriptionParams) (GetSubscriptionRow, error)
+	ListSubscriptions(ctx context.Context, userUid uuid.UUID) ([]ListSubscriptionsRow, error)
+	UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) error
 }
 
 var _ Querier = (*Queries)(nil)

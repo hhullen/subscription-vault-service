@@ -9,6 +9,10 @@ import (
 	sp "subscription-vault-service/internal/secret_provider"
 	"subscription-vault-service/internal/supports"
 	"time"
+
+	uuid "github.com/google/uuid"
+	"github.com/lib/pq"
+	"github.com/lib/pq/pqerror"
 )
 
 const (
@@ -149,4 +153,70 @@ func (db *DB) ExecTx(txOpt *sql.TxOptions, withTx func(context.Context, IQuerier
 
 func (db *DB) Querier() IQuerier {
 	return db.sqlc
+}
+
+func isDuplicate(err error) bool {
+	var pqErr *pq.Error
+	return errors.As(err, &pqErr) && pqErr != nil && pqErr.Code == pqerror.UniqueViolation
+}
+
+func isNoRows(err error) bool {
+	return errors.Is(err, sql.ErrNoRows)
+}
+
+func nullString(s *string) sql.NullString {
+	if s == nil {
+		return sql.NullString{
+			Valid: false,
+		}
+	}
+	return sql.NullString{
+		String: *s,
+		Valid:  true,
+	}
+}
+
+func fromNullString(ns sql.NullString) *string {
+	if ns.Valid {
+		return &ns.String
+	}
+	return nil
+}
+
+func nullUUID(u *uuid.UUID) uuid.NullUUID {
+	if u == nil {
+		return uuid.NullUUID{}
+	}
+	return uuid.NullUUID{
+		UUID:  *u,
+		Valid: true,
+	}
+}
+
+func fromNullUUID(nu uuid.NullUUID) *uuid.UUID {
+	if nu.Valid {
+		return &nu.UUID
+	}
+	return nil
+}
+
+func nullInt64(n *int64) sql.NullInt64 {
+	if n == nil {
+		return sql.NullInt64{Valid: false}
+	}
+	return sql.NullInt64{Valid: true, Int64: *n}
+}
+
+func nullTime(t *time.Time) sql.NullTime {
+	if t == nil {
+		return sql.NullTime{Valid: false}
+	}
+	return sql.NullTime{Time: *t, Valid: true}
+}
+
+func fromNullTime(nt sql.NullTime) *time.Time {
+	if nt.Valid {
+		return &nt.Time
+	}
+	return nil
 }

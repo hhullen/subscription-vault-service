@@ -12,13 +12,42 @@ import (
 	"github.com/google/uuid"
 )
 
-const createSubscription = `-- name: CreateSubscription :one
+const calculateSubscriptionsPrice = `-- name: CalculateSubscriptionsPrice :one
+SELECT SUM(price)
+FROM subscriptions
+WHERE "from" >= $1
+    AND "to" <= $2
+    AND (user_uid = $3 OR $3 IS NULL)
+    AND (service_name = $4 OR $4 IS NULL)
+ORDER BY "from"
+`
+
+type CalculateSubscriptionsPriceParams struct {
+	From        sql.NullTime
+	To          sql.NullTime
+	UserUid     uuid.NullUUID
+	ServiceName sql.NullString
+}
+
+func (q *Queries) CalculateSubscriptionsPrice(ctx context.Context, arg CalculateSubscriptionsPriceParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, calculateSubscriptionsPrice,
+		arg.From,
+		arg.To,
+		arg.UserUid,
+		arg.ServiceName,
+	)
+	var sum int64
+	err := row.Scan(&sum)
+	return sum, err
+}
+
+const createSubscription = `-- name: CreateSubscription :exec
 INSERT INTO subscriptions 
 (user_uid, service_name, price, "from", "to") VALUES
 ($1, $2, $3, $4, $5)
 ON CONFLICT (user_uid, service_name)
 DO NOTHING
-RETURNING user_uid
+RETURNING id
 `
 
 type CreateSubscriptionParams struct {
@@ -29,15 +58,133 @@ type CreateSubscriptionParams struct {
 	To          sql.NullTime
 }
 
-func (q *Queries) CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) (uuid.UUID, error) {
-	row := q.db.QueryRowContext(ctx, createSubscription,
+func (q *Queries) CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) error {
+	_, err := q.db.ExecContext(ctx, createSubscription,
 		arg.UserUid,
 		arg.ServiceName,
 		arg.Price,
 		arg.From,
 		arg.To,
 	)
-	var user_uid uuid.UUID
-	err := row.Scan(&user_uid)
-	return user_uid, err
+	return err
+}
+
+const deleteSubscription = `-- name: DeleteSubscription :exec
+DELETE FROM subscriptions
+WHERE user_uid = $1
+    AND service_name = $2
+`
+
+type DeleteSubscriptionParams struct {
+	UserUid     uuid.UUID
+	ServiceName string
+}
+
+func (q *Queries) DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) error {
+	_, err := q.db.ExecContext(ctx, deleteSubscription, arg.UserUid, arg.ServiceName)
+	return err
+}
+
+const getSubscription = `-- name: GetSubscription :one
+SELECT user_uid, service_name, price, "from", "to"
+FROM subscriptions
+WHERE user_uid = $1
+    AND service_name = $2
+`
+
+type GetSubscriptionParams struct {
+	UserUid     uuid.UUID
+	ServiceName string
+}
+
+type GetSubscriptionRow struct {
+	UserUid     uuid.UUID
+	ServiceName string
+	Price       int64
+	From        sql.NullTime
+	To          sql.NullTime
+}
+
+func (q *Queries) GetSubscription(ctx context.Context, arg GetSubscriptionParams) (GetSubscriptionRow, error) {
+	row := q.db.QueryRowContext(ctx, getSubscription, arg.UserUid, arg.ServiceName)
+	var i GetSubscriptionRow
+	err := row.Scan(
+		&i.UserUid,
+		&i.ServiceName,
+		&i.Price,
+		&i.From,
+		&i.To,
+	)
+	return i, err
+}
+
+const listSubscriptions = `-- name: ListSubscriptions :many
+SELECT user_uid, service_name, price, "from", "to"
+FROM subscriptions
+WHERE user_uid = $1
+`
+
+type ListSubscriptionsRow struct {
+	UserUid     uuid.UUID
+	ServiceName string
+	Price       int64
+	From        sql.NullTime
+	To          sql.NullTime
+}
+
+func (q *Queries) ListSubscriptions(ctx context.Context, userUid uuid.UUID) ([]ListSubscriptionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listSubscriptions, userUid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSubscriptionsRow
+	for rows.Next() {
+		var i ListSubscriptionsRow
+		if err := rows.Scan(
+			&i.UserUid,
+			&i.ServiceName,
+			&i.Price,
+			&i.From,
+			&i.To,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateSubscription = `-- name: UpdateSubscription :exec
+UPDATE subscriptions
+SET price = $1,
+    "from" = $2,
+    "to" = $3
+WHERE user_uid = $4
+    AND service_name = $5
+`
+
+type UpdateSubscriptionParams struct {
+	Price       int64
+	From        sql.NullTime
+	To          sql.NullTime
+	UserUid     uuid.UUID
+	ServiceName string
+}
+
+func (q *Queries) UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) error {
+	_, err := q.db.ExecContext(ctx, updateSubscription,
+		arg.Price,
+		arg.From,
+		arg.To,
+		arg.UserUid,
+		arg.ServiceName,
+	)
+	return err
 }

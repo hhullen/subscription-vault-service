@@ -20,6 +20,9 @@ const (
 	StatusDataTooLong              = "some data too long"
 	StatusFailedExctractingRequest = "failed extracting request"
 	StatusFailedValidatingRequest  = "failed validating request"
+
+	DefaultSecretsDir          = "./secrets/"
+	DefaultContainerSecretsDir = "/run/secrets/"
 )
 
 // type DateType time.Time
@@ -49,13 +52,13 @@ func (s Status) GetStatus() string {
 }
 
 type SubscriptionID struct {
-	ServiceName string    `json:"service_name" validate:"required" example:"Poople"`
-	UserUid     uuid.UUID `json:"user_uid" validate:"required" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
+	ServiceName string    `json:"service_name" schema:"service_name" validate:"required" example:"Poople"`
+	UserUid     uuid.UUID `json:"user_uid" schema:"user_uid" validate:"required" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
 }
 
 type Period struct {
-	From time.Time `json:"from" validate:"required" example:"31.12.2006"`
-	To   time.Time `json:"to" validate:"required" example:"31.12.2007"`
+	From time.Time `json:"start_date" schema:"start_date" validate:"required" example:"31.12.2006"`
+	To   time.Time `json:"end_date" schema:"end_date" validate:"required" example:"31.12.2007"`
 }
 
 type Subscription struct {
@@ -98,7 +101,7 @@ type DeleteSubscriptionResponse struct {
 }
 
 type ListSubscriptionsRequest struct {
-	UserUid uuid.UUID `json:"user_uid" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
+	UserUid uuid.UUID `schema:"user_uid" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
 }
 
 type ListSubscriptionsResponse struct {
@@ -108,8 +111,8 @@ type ListSubscriptionsResponse struct {
 
 type CalculateSubscriptionsPriceRequest struct {
 	Period
-	ServiceName *string    `json:"service_name" example:"Poople"`
-	UserUid     *uuid.UUID `json:"user_uid" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
+	ServiceName *string    `schema:"service_name" example:"Poople"`
+	UserUid     *uuid.UUID `schema:"user_uid" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
 }
 
 type CalculateSubscriptionsPriceResponse struct {

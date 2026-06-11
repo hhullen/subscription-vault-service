@@ -4,20 +4,20 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"syscall"
+
 	"subscription-vault-service/internal/api/v1"
 	"subscription-vault-service/internal/clients/postgres"
+	ds "subscription-vault-service/internal/datastruct"
 	gracefulterminator "subscription-vault-service/internal/graceful_terminator"
 	"subscription-vault-service/internal/logger"
 	secretprovider "subscription-vault-service/internal/secret_provider"
 	"subscription-vault-service/internal/service"
 	"subscription-vault-service/internal/supports"
-	"syscall"
 )
 
 const (
-	address                    = ":8080"
-	defaultSecretsDir          = "./secrets/"
-	defaultContainerSecretsDir = "/run/secrets/"
+	address = ":8080"
 )
 
 // @title           Subscription vault service
@@ -52,9 +52,9 @@ func main() {
 		dbLog.Stop()
 	})
 
-	secretDir := defaultSecretsDir
+	secretDir := ds.DefaultSecretsDir
 	if supports.IsInContainer() {
-		secretDir = defaultContainerSecretsDir
+		secretDir = ds.DefaultContainerSecretsDir
 	}
 
 	secrets := secretprovider.NewSecretProvider(secretDir)
@@ -87,7 +87,7 @@ func main() {
 		}
 	})
 
-	if apiService.StartListening() != nil {
+	if err := apiService.StartListening(); err != nil {
 		apiLog.FatalKV("rinning api", "error", err.Error())
 		return
 	}

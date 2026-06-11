@@ -1,7 +1,40 @@
--- name: CreateSubscription :one
+-- name: CreateSubscription :exec
 INSERT INTO subscriptions 
 (user_uid, service_name, price, "from", "to") VALUES
 ($1, $2, $3, $4, $5)
 ON CONFLICT (user_uid, service_name)
 DO NOTHING
-RETURNING user_uid;
+RETURNING id;
+
+-- name: GetSubscription :one
+SELECT user_uid, service_name, price, "from", "to"
+FROM subscriptions
+WHERE user_uid = $1
+    AND service_name = $2;
+
+-- name: UpdateSubscription :exec
+UPDATE subscriptions
+SET price = $1,
+    "from" = $2,
+    "to" = $3
+WHERE user_uid = $4
+    AND service_name = $5;
+
+-- name: DeleteSubscription :exec
+DELETE FROM subscriptions
+WHERE user_uid = $1
+    AND service_name = $2;
+
+-- name: ListSubscriptions :many
+SELECT user_uid, service_name, price, "from", "to"
+FROM subscriptions
+WHERE user_uid = $1;
+
+-- name: CalculateSubscriptionsPrice :one
+SELECT SUM(price)
+FROM subscriptions
+WHERE "from" >= $1
+    AND "to" <= $2
+    AND (user_uid = sqlc.narg(user_uid) OR sqlc.narg(user_uid) IS NULL)
+    AND (service_name = sqlc.narg(service_name) OR sqlc.narg(service_name) IS NULL)
+ORDER BY "from";

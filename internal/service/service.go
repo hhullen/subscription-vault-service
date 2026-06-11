@@ -42,26 +42,62 @@ func buildService(ctx context.Context, store ISubscriptionsStorage, log ILogger)
 	}
 }
 
-func (s *Service) AddSubscription(*ds.CreateSubscriptionRequest) *ds.CreateSubscriptionResponse {
+func (s *Service) AddSubscription(req *ds.CreateSubscriptionRequest) *ds.CreateSubscriptionResponse {
+	resp, err := s.subsStore.AddSubscription(req)
+	if err != nil {
+		s.log.ErrorKV("AddSubscription.AddSubscription", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }
 
-func (s *Service) GetSubscription(*ds.GetSubscriptionRequest) *ds.GetSubscriptionResponse {
+func (s *Service) GetSubscription(req *ds.GetSubscriptionRequest) *ds.GetSubscriptionResponse {
+	resp, err := s.subsStore.GetSubscription(req)
+	if err != nil {
+		s.log.ErrorKV("GetSubscription.GetSubscription", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }
 
-func (s *Service) UpdateSubscription(*ds.UpdateSubscriptionRequest) *ds.UpdateSubscriptionResponse {
+func (s *Service) UpdateSubscription(req *ds.UpdateSubscriptionRequest) *ds.UpdateSubscriptionResponse {
+	resp, err := s.subsStore.UpdateSubscription(req)
+	if err != nil {
+		s.log.ErrorKV("UpdateSubscription.UpdateSubscription", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }
 
-func (s *Service) DeleteSubscription(*ds.DeleteSubscriptionRequest) *ds.DeleteSubscriptionResponse {
+func (s *Service) DeleteSubscription(req *ds.DeleteSubscriptionRequest) *ds.DeleteSubscriptionResponse {
+	resp, err := s.subsStore.DeleteSubscription(req)
+	if err != nil {
+		s.log.ErrorKV("DeleteSubscription.DeleteSubscription", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }
 
-func (s *Service) ListSubscriptions(*ds.ListSubscriptionsRequest) *ds.ListSubscriptionsResponse {
+func (s *Service) ListSubscriptions(req *ds.ListSubscriptionsRequest) *ds.ListSubscriptionsResponse {
+	resp, err := s.subsStore.ListSubscriptions(req)
+	if err != nil {
+		s.log.ErrorKV("ListSubscriptions.ListSubscriptions", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }
 
-func (s *Service) CalculateSubscriptionsPrice(*ds.CalculateSubscriptionsPriceRequest) *ds.CalculateSubscriptionsPriceResponse {
+func (s *Service) CalculateSubscriptionsPrice(req *ds.CalculateSubscriptionsPriceRequest) *ds.CalculateSubscriptionsPriceResponse {
+	resp, err := s.subsStore.CalculateSubscriptionsPrice(req)
+	if err != nil {
+		s.log.ErrorKV("CalculateSubscriptionsPrice.CalculateSubscriptionsPrice", "error", err.Error())
+		return nil
+	}
 
+	return resp
 }

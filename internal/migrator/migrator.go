@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"log"
 
-	// "subscription-vault-service/internal/clients/mysql"
 	"subscription-vault-service/internal/clients/postgres"
+	ds "subscription-vault-service/internal/datastruct"
 	secretprovider "subscription-vault-service/internal/secret_provider"
 	"subscription-vault-service/internal/supports"
 
@@ -21,9 +21,6 @@ const (
 	cmdStatus     = "status"
 
 	dbDialect = "mysql"
-
-	defaultSecretsDir          = "./secrets/"
-	defaultContainerSecretsDir = "/run/secrets/"
 )
 
 var executors = map[string]func(db *sql.DB, dir string, opts ...goose.OptionsFunc) error{
@@ -37,9 +34,9 @@ func Migrate(command string) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	secretDir := defaultSecretsDir
+	secretDir := ds.DefaultSecretsDir
 	if supports.IsInContainer() {
-		secretDir = defaultContainerSecretsDir
+		secretDir = ds.DefaultContainerSecretsDir
 	}
 
 	sp := secretprovider.NewSecretProvider(secretDir)
