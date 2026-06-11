@@ -4,9 +4,11 @@ import (
 	"context"
 	"net/http"
 	"time"
-	
+
 	ds "subscription-vault-service/internal/datastruct"
 	"subscription-vault-service/internal/supports"
+
+	_ "subscription-vault-service/internal/docs"
 
 	"github.com/gorilla/schema"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -30,6 +32,10 @@ const (
 )
 
 var schemaDecoder = schema.NewDecoder()
+
+func init() {
+	schemaDecoder.RegisterConverter(ds.DateType{}, ds.ParseSchemaDateType)
+}
 
 type IWithStatus interface {
 	GetStatus() string

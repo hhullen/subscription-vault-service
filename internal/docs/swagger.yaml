@@ -1,0 +1,344 @@
+basePath: /api/v1
+definitions:
+  datastruct.CalculateSubscriptionsPriceResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+      total_price:
+        type: integer
+    type: object
+  datastruct.CreateSubscriptionRequest:
+    properties:
+      end_date:
+        example: 31.12.2007
+        type: string
+      price:
+        example: 399
+        type: integer
+      service_name:
+        example: Poople
+        type: string
+      start_date:
+        example: 31.12.2006
+        type: string
+      user_uid:
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        type: string
+    required:
+    - end_date
+    - price
+    - service_name
+    - start_date
+    - user_uid
+    type: object
+  datastruct.CreateSubscriptionResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+    type: object
+  datastruct.DeleteSubscriptionRequest:
+    properties:
+      service_name:
+        example: Poople
+        type: string
+      user_uid:
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        type: string
+    required:
+    - service_name
+    - user_uid
+    type: object
+  datastruct.DeleteSubscriptionResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+    type: object
+  datastruct.GetSubscriptionResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+      subscription:
+        $ref: '#/definitions/datastruct.Subscription'
+    type: object
+  datastruct.ListSubscriptionsResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+      subscriptions:
+        items:
+          $ref: '#/definitions/datastruct.Subscription'
+        type: array
+    type: object
+  datastruct.Status:
+    properties:
+      status:
+        example: status message
+        type: string
+    type: object
+  datastruct.Subscription:
+    properties:
+      end_date:
+        example: 31.12.2007
+        type: string
+      price:
+        example: 399
+        type: integer
+      service_name:
+        example: Poople
+        type: string
+      start_date:
+        example: 31.12.2006
+        type: string
+      user_uid:
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        type: string
+    required:
+    - end_date
+    - price
+    - service_name
+    - start_date
+    - user_uid
+    type: object
+  datastruct.UpdateSubscriptionRequest:
+    properties:
+      end_date:
+        example: 31.12.2007
+        type: string
+      price:
+        example: 399
+        type: integer
+      service_name:
+        example: Poople
+        type: string
+      start_date:
+        example: 31.12.2006
+        type: string
+      user_uid:
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        type: string
+    required:
+    - end_date
+    - price
+    - service_name
+    - start_date
+    - user_uid
+    type: object
+  datastruct.UpdateSubscriptionResponse:
+    properties:
+      status:
+        example: status message
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: hhullen@gmail.com
+    name: Maksim
+    url: https://github.com/hhullen
+  description: Service for managing subscriptions
+  license:
+    name: Creative Commons Attribution-NonCommercial 4.0 International Public License
+    url: https://creativecommons.org/licenses/by-nc/4.0/deed.en
+  termsOfService: http://swagger.io/terms/
+  title: Subscription vault service
+  version: "1.0"
+paths:
+  /subscriptions:
+    delete:
+      consumes:
+      - application/json
+      description: Delete subscription.
+      parameters:
+      - description: Subscription
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/datastruct.DeleteSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.DeleteSubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: Delete subscription
+      tags:
+      - Subscriptions
+    get:
+      description: Get subscription.
+      parameters:
+      - description: service_name
+        example: Poople
+        in: query
+        name: service_name
+        required: true
+        type: string
+      - description: user_uid
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        in: query
+        name: user_uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.GetSubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: Get subscription
+      tags:
+      - Subscriptions
+    patch:
+      consumes:
+      - application/json
+      description: Update subscription.
+      parameters:
+      - description: Subscription
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/datastruct.UpdateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.UpdateSubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: Update subscription
+      tags:
+      - Subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Create new subscription.
+      parameters:
+      - description: Subscription
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/datastruct.CreateSubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.CreateSubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: Create new subscription
+      tags:
+      - Subscriptions
+  /subscriptions/list:
+    get:
+      description: List subscriptions.
+      parameters:
+      - description: user_uid
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        in: query
+        name: user_uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.ListSubscriptionsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: List subscriptions
+      tags:
+      - Subscriptions
+  /subscriptions/total_price:
+    get:
+      description: Calculate price of subscriptions.
+      parameters:
+      - description: start_date
+        example: 31.12.2006
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: end_date
+        example: 31.12.2008
+        in: query
+        name: end_date
+        required: true
+        type: string
+      - description: service_name
+        example: Poople
+        in: query
+        name: service_name
+        type: string
+      - description: user_uid
+        example: 4988150e-1c82-490f-8c07-ee74ace2dd14
+        in: query
+        name: user_uid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/datastruct.CalculateSubscriptionsPriceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/datastruct.Status'
+      summary: Calculate price of subscriptions
+      tags:
+      - Subscriptions
+swagger: "2.0"

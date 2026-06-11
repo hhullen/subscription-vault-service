@@ -14,13 +14,13 @@ import (
 )
 
 const (
-	migrationsDir = "./migrations/mysql"
+	migrationsDir = "./migrations/postgres"
 	cmdUp         = "up"
 	cmdDown       = "down"
 	cmdDownAll    = "down-all"
 	cmdStatus     = "status"
 
-	dbDialect = "mysql"
+	dbDialect = "postgres"
 )
 
 var executors = map[string]func(db *sql.DB, dir string, opts ...goose.OptionsFunc) error{

@@ -38,11 +38,6 @@ func main() {
 	ctx, cancelCtx := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancelCtx()
 
-	go func() {
-		<-ctx.Done()
-		gracefulterminator.Stop()
-	}()
-
 	apiLog := logger.NewLogger(os.Stdout, "API")
 	serviceLog := logger.NewLogger(os.Stdout, "SERVICE")
 	dbLog := logger.NewLogger(os.Stdout, "DB")
@@ -87,8 +82,13 @@ func main() {
 		}
 	})
 
-	if err := apiService.StartListening(); err != nil {
-		apiLog.FatalKV("rinning api", "error", err.Error())
-		return
-	}
+	go func() {
+		if err := apiService.StartListening(); err != nil {
+			apiLog.FatalKV("rinning api", "error", err.Error())
+			return
+		}
+	}()
+
+	<-ctx.Done()
+	gracefulterminator.Stop()
 }

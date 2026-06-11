@@ -21,11 +21,11 @@ API_DIR=internal/api/v1
 MIGRATOR_DIR=./cmd/migrator
 MIGRATOR_BIN=$(MIGRATOR_DIR)/migrator$(EXTENSION)
 
-TEAM_TASK_MANAGER_DIR=./cmd/$(PROJECT_NAME)
-TEAM_TASK_MANAGER_BIN=$(TEAM_TASK_MANAGER_DIR)/$(PROJECT_NAME)$(EXTENSION)
+SUBSCRIPTION_VAULT_SERVICE_DIR=./cmd/$(PROJECT_NAME)
+SUBSCRIPTION_VAULT_SERVICE_BIN=$(SUBSCRIPTION_VAULT_SERVICE_DIR)/$(PROJECT_NAME)$(EXTENSION)
 
 LOCAL_DB_NAME=$(PROJECT_NAME)-local-database
-LOCAL_DB_DATA_NAME=local_$(PROJECT_NAME)_mysql_data
+LOCAL_DB_DATA_NAME=local_$(PROJECT_NAME)_postgres_data
 LOCAL_REDIS_NAME=$(PROJECT_NAME)-local-redis
 LOCAL_REDIS_DATA_NAME=local_$(PROJECT_NAME)_redis_data
 
@@ -72,7 +72,7 @@ $(SWAG_BIN):
 	go install -a github.com/swaggo/swag/cmd/swag@latest
 
 generate-swag: $(SWAG_BIN)
-	swag init -d $(TEAM_TASK_MANAGER_DIR),$(SERVICE_DATASTRUCT_DIR),$(API_DIR) -o $(SWAG_DOCS_DIR)
+	swag init -d $(SUBSCRIPTION_VAULT_SERVICE_DIR),$(SERVICE_DATASTRUCT_DIR),$(API_DIR) -o $(SWAG_DOCS_DIR)
 
 $(MIGRATOR_BIN):
 	go build -o $(MIGRATOR_BIN) $(MIGRATOR_DIR)
@@ -89,16 +89,18 @@ migrations-down-all: $(MIGRATOR_BIN)
 migrations-status: $(MIGRATOR_BIN)
 	$(MIGRATOR_BIN) status
 
-DB_ENV+= -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password 
-DB_ENV+= -e MYSQL_DATABASE_FILE=/run/secrets/db_name
+DB_ENV+= -e POSTGRES_PASSWORD_FILE=/run/secrets/db_root_password
+DB_ENV+= -e POSTGRES_USER_FILE=/run/secrets/db_root_user
+DB_ENV+= -e POSTGRES_DB_FILE=/run/secrets/db_name
 
 DB_VOL+= -v $(PWD)/secrets/db_root_password:/run/secrets/db_root_password:ro
+DB_VOL+= -v $(PWD)/secrets/db_root_user:/run/secrets/db_root_user:ro
 DB_VOL+= -v $(PWD)/secrets/db_app_password:/run/secrets/db_app_password:ro
 DB_VOL+= -v $(PWD)/secrets/db_app_user:/run/secrets/db_app_user:ro
 DB_VOL+= -v $(PWD)/secrets/db_migrator_password:/run/secrets/db_migrator_password:ro
 DB_VOL+= -v $(PWD)/secrets/db_migrator_user:/run/secrets/db_migrator_user:ro
 DB_VOL+= -v $(PWD)/secrets/db_name:/run/secrets/db_name:ro
-DB_VOL+= -v $(LOCAL_DB_DATA_NAME):var/lib/postgresql/data
+DB_VOL+= -v $(LOCAL_DB_DATA_NAME):/var/lib/postgresql/data
 DB_VOL+= -v $(PWD)/init/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
 DB_VOL+= -v $(PWD)/init/init_roles.sql:/sql_init/init_roles.sql:ro
 
@@ -111,14 +113,14 @@ stop-local-database:
 clean-local-database:
 	docker volume rm $(LOCAL_DB_DATA_NAME)
 
-run-local: $(TEAM_TASK_MANAGER_BIN)
-	$(TEAM_TASK_MANAGER_BIN)
+run-local: $(SUBSCRIPTION_VAULT_SERVICE_BIN)
+	$(SUBSCRIPTION_VAULT_SERVICE_BIN)
 
 run-local-fast:
-	go run $(TEAM_TASK_MANAGER_DIR)/main.go
+	go run $(SUBSCRIPTION_VAULT_SERVICE_DIR)/main.go
 
-$(TEAM_TASK_MANAGER_BIN):
-	go build -o $(TEAM_TASK_MANAGER_BIN) $(TEAM_TASK_MANAGER_DIR)
+$(SUBSCRIPTION_VAULT_SERVICE_BIN):
+	go build -o $(SUBSCRIPTION_VAULT_SERVICE_BIN) $(SUBSCRIPTION_VAULT_SERVICE_DIR)
 
 service:
 	docker compose up
@@ -151,4 +153,4 @@ clean-go-cache:
 	go env -w GOPROXY=https://proxy.golang.org,direct
 
 clean:
-	$(RM) $(MIGRATOR_BIN) $(TEAM_TASK_MANAGER_BIN) $(COVERAGE_FILE) $(COVERAGE_FILE)$(NOT_FILTERED_SUFF) $(RM_POSTFIX)
+	$(RM) $(MIGRATOR_BIN) $(SUBSCRIPTION_VAULT_SERVICE_BIN) $(COVERAGE_FILE) $(COVERAGE_FILE)$(NOT_FILTERED_SUFF) $(RM_POSTFIX)

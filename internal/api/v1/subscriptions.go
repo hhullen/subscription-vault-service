@@ -75,7 +75,7 @@ func (a *API) GetSubscription(w http.ResponseWriter, r *http.Request) {
 // @Success      200   {object}  ds.UpdateSubscriptionResponse
 // @Failure      400   {object}  ds.Status
 // @Failure      500   {object}  ds.Status
-// @Router       /subscriptions [update]
+// @Router       /subscriptions [patch]
 func (a *API) UpdateSubscription(w http.ResponseWriter, r *http.Request) {
 	Exec(ExecArgs[ds.UpdateSubscriptionRequest, ds.UpdateSubscriptionResponse]{
 		serviceFunc:      a.subsService.UpdateSubscription,
@@ -135,11 +135,11 @@ func (a *API) ListSubscriptions(w http.ResponseWriter, r *http.Request) {
 // @Description  Calculate price of subscriptions.
 // @Tags         Subscriptions
 // @Produce      json
-// @Param        from           query     string                                  true  "from"         example(31.12.2006)
-// @Param        to             query     string                                  true  "to"           example(31.12.2008)
+// @Param        start_date     query     string                                  true  "start_date"   example(31.12.2006)
+// @Param        end_date       query     string                                  true  "end_date"     example(31.12.2008)
 // @Param        service_name   query     string                                  false "service_name" example(Poople)
 // @Param        user_uid       query     string                                  false "user_uid"     example(4988150e-1c82-490f-8c07-ee74ace2dd14)
-// @Success      200            {object}  ds. CalculateSubscriptionsPriceResponse
+// @Success      200            {object}  ds.CalculateSubscriptionsPriceResponse
 // @Failure      400            {object}  ds.Status
 // @Failure      500            {object}  ds.Status
 // @Router       /subscriptions/total_price  [get]

@@ -13,41 +13,37 @@ import (
 )
 
 const calculateSubscriptionsPrice = `-- name: CalculateSubscriptionsPrice :one
-SELECT SUM(price)
+SELECT COALESCE(SUM(price), 0)::BIGINT AS total_sum
 FROM subscriptions
 WHERE "from" >= $1
-    AND "to" <= $2
+    AND "from" <= $2
     AND (user_uid = $3 OR $3 IS NULL)
     AND (service_name = $4 OR $4 IS NULL)
-ORDER BY "from"
 `
 
 type CalculateSubscriptionsPriceParams struct {
-	From        sql.NullTime
-	To          sql.NullTime
+	FromDate    sql.NullTime
+	ToDate      sql.NullTime
 	UserUid     uuid.NullUUID
 	ServiceName sql.NullString
 }
 
 func (q *Queries) CalculateSubscriptionsPrice(ctx context.Context, arg CalculateSubscriptionsPriceParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, calculateSubscriptionsPrice,
-		arg.From,
-		arg.To,
+		arg.FromDate,
+		arg.ToDate,
 		arg.UserUid,
 		arg.ServiceName,
 	)
-	var sum int64
-	err := row.Scan(&sum)
-	return sum, err
+	var total_sum int64
+	err := row.Scan(&total_sum)
+	return total_sum, err
 }
 
 const createSubscription = `-- name: CreateSubscription :exec
 INSERT INTO subscriptions 
 (user_uid, service_name, price, "from", "to") VALUES
 ($1, $2, $3, $4, $5)
-ON CONFLICT (user_uid, service_name)
-DO NOTHING
-RETURNING id
 `
 
 type CreateSubscriptionParams struct {
@@ -69,7 +65,7 @@ func (q *Queries) CreateSubscription(ctx context.Context, arg CreateSubscription
 	return err
 }
 
-const deleteSubscription = `-- name: DeleteSubscription :exec
+const deleteSubscription = `-- name: DeleteSubscription :execresult
 DELETE FROM subscriptions
 WHERE user_uid = $1
     AND service_name = $2
@@ -80,9 +76,8 @@ type DeleteSubscriptionParams struct {
 	ServiceName string
 }
 
-func (q *Queries) DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) error {
-	_, err := q.db.ExecContext(ctx, deleteSubscription, arg.UserUid, arg.ServiceName)
-	return err
+func (q *Queries) DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteSubscription, arg.UserUid, arg.ServiceName)
 }
 
 const getSubscription = `-- name: GetSubscription :one
@@ -161,7 +156,7 @@ func (q *Queries) ListSubscriptions(ctx context.Context, userUid uuid.UUID) ([]L
 	return items, nil
 }
 
-const updateSubscription = `-- name: UpdateSubscription :exec
+const updateSubscription = `-- name: UpdateSubscription :execresult
 UPDATE subscriptions
 SET price = $1,
     "from" = $2,
@@ -178,13 +173,12 @@ type UpdateSubscriptionParams struct {
 	ServiceName string
 }
 
-func (q *Queries) UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) error {
-	_, err := q.db.ExecContext(ctx, updateSubscription,
+func (q *Queries) UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateSubscription,
 		arg.Price,
 		arg.From,
 		arg.To,
 		arg.UserUid,
 		arg.ServiceName,
 	)
-	return err
 }

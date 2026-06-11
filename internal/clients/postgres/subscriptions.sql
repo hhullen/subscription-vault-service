@@ -1,10 +1,7 @@
 -- name: CreateSubscription :exec
 INSERT INTO subscriptions 
 (user_uid, service_name, price, "from", "to") VALUES
-($1, $2, $3, $4, $5)
-ON CONFLICT (user_uid, service_name)
-DO NOTHING
-RETURNING id;
+($1, $2, $3, $4, $5);
 
 -- name: GetSubscription :one
 SELECT user_uid, service_name, price, "from", "to"
@@ -12,7 +9,7 @@ FROM subscriptions
 WHERE user_uid = $1
     AND service_name = $2;
 
--- name: UpdateSubscription :exec
+-- name: UpdateSubscription :execresult
 UPDATE subscriptions
 SET price = $1,
     "from" = $2,
@@ -20,7 +17,7 @@ SET price = $1,
 WHERE user_uid = $4
     AND service_name = $5;
 
--- name: DeleteSubscription :exec
+-- name: DeleteSubscription :execresult
 DELETE FROM subscriptions
 WHERE user_uid = $1
     AND service_name = $2;
@@ -31,10 +28,9 @@ FROM subscriptions
 WHERE user_uid = $1;
 
 -- name: CalculateSubscriptionsPrice :one
-SELECT SUM(price)
+SELECT COALESCE(SUM(price), 0)::BIGINT AS total_sum
 FROM subscriptions
-WHERE "from" >= $1
-    AND "to" <= $2
+WHERE "from" >= sqlc.arg(from_date)
+    AND "from" <= sqlc.arg(to_date)
     AND (user_uid = sqlc.narg(user_uid) OR sqlc.narg(user_uid) IS NULL)
-    AND (service_name = sqlc.narg(service_name) OR sqlc.narg(service_name) IS NULL)
-ORDER BY "from";
+    AND (service_name = sqlc.narg(service_name) OR sqlc.narg(service_name) IS NULL);

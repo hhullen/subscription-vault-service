@@ -21,8 +21,8 @@ const (
 
 	db_host_secret_path     = "db_host"
 	db_port_secret_path     = "db_port"
-	db_password_secret_path = "db_password"
-	db_user_secret_path     = "db_user"
+	db_password_secret_path = "db_root_password"
+	db_user_secret_path     = "db_root_user"
 	db_name_secret_path     = "db_name"
 )
 

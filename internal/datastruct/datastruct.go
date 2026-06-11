@@ -2,6 +2,10 @@ package datastruct
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
+	"strings"
+	"subscription-vault-service/internal/supports"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,23 +29,40 @@ const (
 	DefaultContainerSecretsDir = "/run/secrets/"
 )
 
-// type DateType time.Time
+type DateType time.Time
 
-// func (d *DateType) UnmarshalJSON(b []byte) error {
-// 	s := strings.Trim(string(b), "\"")
+func (d *DateType) Time() time.Time {
+	return time.Time(*d)
+}
 
-// 	dt, err := supports.ParseDate(s)
-// 	if err != nil {
-// 		return fmt.Errorf("incorrect date value: '%s'", s)
-// 	}
+func (d *DateType) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), "\"")
 
-// 	*d = DateType(dt)
-// 	return nil
-// }
+	dt, err := supports.ParseDate(s)
+	if err != nil {
+		return fmt.Errorf("incorrect date value: '%s'", s)
+	}
 
-// func (g *DateType) MarshalJSON() ([]byte, error) {
-// 	return fmt.Appendf(nil, "\"%s\"", time.Time(*g).Format(time.DateOnly)), nil
-// }
+	*d = DateType(dt)
+	return nil
+}
+
+func (g *DateType) MarshalJSON() ([]byte, error) {
+	return fmt.Appendf(nil, "\"%s\"", time.Time(*g).Format(time.DateOnly)), nil
+}
+
+func ParseSchemaDateType(value string) reflect.Value {
+	if value == "" {
+		return reflect.ValueOf(DateType{})
+	}
+
+	dt, err := supports.ParseDate(value)
+	if err != nil {
+		return reflect.ValueOf(DateType{})
+	}
+
+	return reflect.ValueOf(DateType(dt))
+}
 
 type Status struct {
 	Message string `json:"status,omitempty" example:"status message"`
@@ -57,8 +78,8 @@ type SubscriptionID struct {
 }
 
 type Period struct {
-	From time.Time `json:"start_date" schema:"start_date" validate:"required" example:"31.12.2006"`
-	To   time.Time `json:"end_date" schema:"end_date" validate:"required" example:"31.12.2007"`
+	From DateType `json:"start_date" schema:"start_date" validate:"required" example:"31.12.2006"`
+	To   DateType `json:"end_date" schema:"end_date" validate:"required" example:"31.12.2007"`
 }
 
 type Subscription struct {
@@ -80,7 +101,7 @@ type GetSubscriptionRequest struct {
 }
 
 type GetSubscriptionResponse struct {
-	Subscriptions Subscription
+	Subscription *Subscription `json:"subscription,omitempty"`
 	Status
 }
 
@@ -105,7 +126,7 @@ type ListSubscriptionsRequest struct {
 }
 
 type ListSubscriptionsResponse struct {
-	Subscriptions []Subscription
+	Subscriptions []Subscription `json:"subscriptions,omitempty"`
 	Status
 }
 
@@ -117,5 +138,5 @@ type CalculateSubscriptionsPriceRequest struct {
 
 type CalculateSubscriptionsPriceResponse struct {
 	Status
-	TotalPrice int64
+	TotalPrice int64 `json:"total_price"`
 }

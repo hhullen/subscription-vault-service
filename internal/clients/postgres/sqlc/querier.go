@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -13,10 +14,10 @@ import (
 type Querier interface {
 	CalculateSubscriptionsPrice(ctx context.Context, arg CalculateSubscriptionsPriceParams) (int64, error)
 	CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) error
-	DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) error
+	DeleteSubscription(ctx context.Context, arg DeleteSubscriptionParams) (sql.Result, error)
 	GetSubscription(ctx context.Context, arg GetSubscriptionParams) (GetSubscriptionRow, error)
 	ListSubscriptions(ctx context.Context, userUid uuid.UUID) ([]ListSubscriptionsRow, error)
-	UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) error
+	UpdateSubscription(ctx context.Context, arg UpdateSubscriptionParams) (sql.Result, error)
 }
 
 var _ Querier = (*Queries)(nil)
