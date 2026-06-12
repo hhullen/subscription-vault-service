@@ -1,0 +1,100 @@
+name: subscription-vault-service
+
+services:
+  subscription-vault-service:
+    container_name: subscription-vault-service
+    build:
+      context: .
+      dockerfile: ./cmd/subscription-vault-service/Dockerfile
+    ports:
+      - 8080:8080
+    init: true
+    restart: always
+    secrets:
+      - db_name
+      - db_host
+      - db_port
+      - db_app_password
+      - db_app_user
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    networks:
+      - subscription-vault-service_network
+
+  migrator:
+    container_name: migrator
+    build:
+      context: .
+      dockerfile: ./cmd/migrator/Dockerfile
+    restart: on-failure
+    secrets:
+      - db_root_user
+      - db_root_password
+      - db_migrator_password
+      - db_migrator_user
+      - db_name
+      - db_host
+      - db_port
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - subscription-vault-service_network
+
+  db:
+    container_name: db
+    image: postgres:18.4-alpine3.23
+    restart: always
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password
+      POSTGRES_USER_FILE: /run/secrets/db_root_user
+      POSTGRES_DB_FILE: /run/secrets/db_name
+    secrets:
+      - db_root_user
+      - db_root_password
+      - db_app_user
+      - db_app_password
+      - db_migrator_password
+      - db_migrator_user
+      - db_name
+    volumes:
+      - subscription-vault-service_postgres_data:/var/lib/postgresql
+      - ./init/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+      - ./init/init_roles.sql:/sql_init/init_roles.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/db_app_user) -d $$(cat /run/secrets/db_name)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - subscription-vault-service_network
+
+secrets:
+  db_root_password:
+    file: ./secrets/db_root_password
+  db_root_user:
+    file: ./secrets/db_root_user
+  db_app_password:
+    file: ./secrets/db_app_password
+  db_app_user:
+    file: ./secrets/db_app_user
+  db_migrator_password:
+    file: ./secrets/db_migrator_password
+  db_migrator_user:
+    file: ./secrets/db_migrator_user
+  db_name:
+    file: ./secrets/db_name
+  db_host:
+    file: ./secrets/db_host
+  db_port:
+    file: ./secrets/db_port
+
+
+volumes:
+  subscription-vault-service_postgres_data:
+
+networks:
+  subscription-vault-service_network:
+    driver: bridge

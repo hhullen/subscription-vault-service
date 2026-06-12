@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"subscription-vault-service/internal/clients/postgres/sqlc"
-	sp "subscription-vault-service/internal/secret_provider"
-	"subscription-vault-service/internal/supports"
 	"time"
 
 	uuid "github.com/google/uuid"
@@ -18,12 +16,6 @@ import (
 const (
 	insertOneTime  = 1000
 	requestTimeout = time.Second * 5
-
-	db_host_secret_path     = "db_host"
-	db_port_secret_path     = "db_port"
-	db_password_secret_path = "db_root_password"
-	db_user_secret_path     = "db_root_user"
-	db_name_secret_path     = "db_name"
 )
 
 var defaultTxOpt = &sql.TxOptions{Isolation: sql.LevelRepeatableRead}
@@ -50,32 +42,7 @@ type Client struct {
 	db IDB
 }
 
-func NewSQLConn(ctx context.Context, sp *sp.SecretProvider) (*sql.DB, error) {
-	host, err := sp.ReadSecret(db_host_secret_path)
-	if err != nil {
-		return nil, err
-	}
-	port, err := sp.ReadSecret(db_port_secret_path)
-	if err != nil {
-		return nil, err
-	}
-	user, err := sp.ReadSecret(db_user_secret_path)
-	if err != nil {
-		return nil, err
-	}
-	password, err := sp.ReadSecret(db_password_secret_path)
-	if err != nil {
-		return nil, err
-	}
-	dbname, err := sp.ReadSecret(db_name_secret_path)
-	if err != nil {
-		return nil, err
-	}
-
-	if !supports.IsInContainer() {
-		host = "localhost"
-	}
-
+func NewSQLConn(ctx context.Context, user, password, host, port, dbname string) (*sql.DB, error) {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
 
 	db, err := sql.Open("postgres", dsn)

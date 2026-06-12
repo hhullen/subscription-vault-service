@@ -14,7 +14,6 @@ type TestAPI struct {
 	serverMock *MockIServer
 	routerMock *MockIRouter
 	loggerMock *service.MockILogger
-	secretMock *MockISecretProvider
 	a          *API
 }
 
@@ -26,12 +25,11 @@ func newTestAPI(t *testing.T) *TestAPI {
 		serverMock: NewMockIServer(mc),
 		routerMock: NewMockIRouter(mc),
 		loggerMock: service.NewMockILogger(mc),
-		secretMock: NewMockISecretProvider(mc),
 	}
 
 	ta.routerMock.EXPECT().Handle(gomock.Any(), gomock.Any()).MinTimes(1)
 
-	a := buildAPI(ta.ctx, ta.subsMock, ta.loggerMock, ta.secretMock, ta.serverMock, ta.routerMock)
+	a := buildAPI(ta.ctx, ta.subsMock, ta.loggerMock, ta.serverMock, ta.routerMock)
 
 	ta.a = a
 

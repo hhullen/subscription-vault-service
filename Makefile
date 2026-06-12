@@ -100,12 +100,12 @@ DB_VOL+= -v $(PWD)/secrets/db_app_user:/run/secrets/db_app_user:ro
 DB_VOL+= -v $(PWD)/secrets/db_migrator_password:/run/secrets/db_migrator_password:ro
 DB_VOL+= -v $(PWD)/secrets/db_migrator_user:/run/secrets/db_migrator_user:ro
 DB_VOL+= -v $(PWD)/secrets/db_name:/run/secrets/db_name:ro
-DB_VOL+= -v $(LOCAL_DB_DATA_NAME):/var/lib/postgresql/data
+DB_VOL+= -v $(LOCAL_DB_DATA_NAME):/var/lib/postgresql
 DB_VOL+= -v $(PWD)/init/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
 DB_VOL+= -v $(PWD)/init/init_roles.sql:/sql_init/init_roles.sql:ro
 
 start-local-database:
-	docker run -d --rm -p 5432:5432 $(DB_ENV) $(DB_VOL) --name $(LOCAL_DB_NAME) postgres:17.5-alpine3.21
+	docker run -d --rm -p 5432:5432 $(DB_ENV) $(DB_VOL) --name $(LOCAL_DB_NAME) postgres:18.4-alpine3.23
 
 stop-local-database:
 	docker container stop $(LOCAL_DB_NAME)

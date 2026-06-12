@@ -18,6 +18,12 @@ import (
 
 const (
 	address = ":8080"
+
+	db_host_secret_path     = "db_host"
+	db_port_secret_path     = "db_port"
+	db_password_secret_path = "db_app_password"
+	db_user_secret_path     = "db_app_user"
+	db_name_secret_path     = "db_name"
 )
 
 // @title           Subscription vault service
@@ -52,9 +58,39 @@ func main() {
 		secretDir = ds.DefaultContainerSecretsDir
 	}
 
-	secrets := secretprovider.NewSecretProvider(secretDir)
+	sp := secretprovider.NewSecretProvider(secretDir)
 
-	dbConn, err := postgres.NewSQLConn(ctx, secrets)
+	host, err := sp.ReadSecret(db_host_secret_path)
+	if err != nil {
+		dbLog.FatalKV("readinng db secret", "error", err.Error())
+		return
+	}
+	port, err := sp.ReadSecret(db_port_secret_path)
+	if err != nil {
+		dbLog.FatalKV("readinng db secret", "error", err.Error())
+		return
+	}
+	user, err := sp.ReadSecret(db_user_secret_path)
+	if err != nil {
+		dbLog.FatalKV("readinng db secret", "error", err.Error())
+		return
+	}
+	password, err := sp.ReadSecret(db_password_secret_path)
+	if err != nil {
+		dbLog.FatalKV("readinng db secret", "error", err.Error())
+		return
+	}
+	dbname, err := sp.ReadSecret(db_name_secret_path)
+	if err != nil {
+		dbLog.FatalKV("readinng db secret", "error", err.Error())
+		return
+	}
+
+	if !supports.IsInContainer() {
+		host = "localhost"
+	}
+
+	dbConn, err := postgres.NewSQLConn(ctx, user, password, host, port, dbname)
 	if err != nil {
 		dbLog.FatalKV("connecting db", "error", err.Error())
 		return
@@ -70,7 +106,7 @@ func main() {
 
 	subsService := service.NewService(ctx, db, serviceLog)
 
-	apiService, err := api.NewAPI(ctx, address, subsService, secrets, apiLog)
+	apiService, err := api.NewAPI(ctx, address, subsService, apiLog)
 	if err != nil {
 		apiLog.FatalKV("creating api", "error", err.Error())
 		return

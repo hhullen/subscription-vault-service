@@ -157,44 +157,6 @@ func (mr *MockISubscriptionServiceMockRecorder) UpdateSubscription(arg0 interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSubscription", reflect.TypeOf((*MockISubscriptionService)(nil).UpdateSubscription), arg0)
 }
 
-// MockISecretProvider is a mock of ISecretProvider interface.
-type MockISecretProvider struct {
-	ctrl     *gomock.Controller
-	recorder *MockISecretProviderMockRecorder
-}
-
-// MockISecretProviderMockRecorder is the mock recorder for MockISecretProvider.
-type MockISecretProviderMockRecorder struct {
-	mock *MockISecretProvider
-}
-
-// NewMockISecretProvider creates a new mock instance.
-func NewMockISecretProvider(ctrl *gomock.Controller) *MockISecretProvider {
-	mock := &MockISecretProvider{ctrl: ctrl}
-	mock.recorder = &MockISecretProviderMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockISecretProvider) EXPECT() *MockISecretProviderMockRecorder {
-	return m.recorder
-}
-
-// ReadSecret mocks base method.
-func (m *MockISecretProvider) ReadSecret(key string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadSecret", key)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ReadSecret indicates an expected call of ReadSecret.
-func (mr *MockISecretProviderMockRecorder) ReadSecret(key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadSecret", reflect.TypeOf((*MockISecretProvider)(nil).ReadSecret), key)
-}
-
 // MockIServer is a mock of IServer interface.
 type MockIServer struct {
 	ctrl     *gomock.Controller

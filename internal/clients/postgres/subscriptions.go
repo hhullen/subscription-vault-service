@@ -1,8 +1,10 @@
 package postgres
 
 import (
+	"fmt"
 	"subscription-vault-service/internal/clients/postgres/sqlc"
 	ds "subscription-vault-service/internal/datastruct"
+	"time"
 )
 
 func (c *Client) AddSubscription(req *ds.CreateSubscriptionRequest) (*ds.CreateSubscriptionResponse, error) {
@@ -69,6 +71,8 @@ func (c *Client) UpdateSubscription(req *ds.UpdateSubscriptionRequest) (*ds.Upda
 	ctx, cancel := c.db.CtxWithCancel()
 	defer cancel()
 
+	fmt.Println("WHAT", req.From.Time().Format(time.DateOnly), req.To.Time().Format(time.DateOnly))
+
 	timeFrom := req.From.Time()
 	timeTo := req.To.Time()
 	res, err := c.db.Querier().UpdateSubscription(ctx, sqlc.UpdateSubscriptionParams{
@@ -132,7 +136,7 @@ func (c *Client) ListSubscriptions(req *ds.ListSubscriptionsRequest) (*ds.ListSu
 
 	for i := range len(res) {
 		ret.Subscriptions[i].From = ds.DateType(res[i].From.Time)
-		ret.Subscriptions[i].To = ds.DateType(res[i].From.Time)
+		ret.Subscriptions[i].To = ds.DateType(res[i].To.Time)
 		ret.Subscriptions[i].Price = res[i].Price
 		ret.Subscriptions[i].ServiceName = res[i].ServiceName
 		ret.Subscriptions[i].UserUid = res[i].UserUid
