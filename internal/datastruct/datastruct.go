@@ -122,7 +122,7 @@ type DeleteSubscriptionResponse struct {
 }
 
 type ListSubscriptionsRequest struct {
-	UserUid uuid.UUID `schema:"user_uid" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
+	UserUid uuid.UUID `schema:"user_uid" validate:"required" example:"4988150e-1c82-490f-8c07-ee74ace2dd14"`
 }
 
 type ListSubscriptionsResponse struct {
