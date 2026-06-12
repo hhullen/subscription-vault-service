@@ -6,6 +6,7 @@ package service
 
 import (
 	reflect "reflect"
+	datastruct "subscription-vault-service/internal/datastruct"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -99,4 +100,117 @@ func (mr *MockILoggerMockRecorder) WarnKV(message interface{}, argsKV ...interfa
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{message}, argsKV...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WarnKV", reflect.TypeOf((*MockILogger)(nil).WarnKV), varargs...)
+}
+
+// MockISubscriptionsStorage is a mock of ISubscriptionsStorage interface.
+type MockISubscriptionsStorage struct {
+	ctrl     *gomock.Controller
+	recorder *MockISubscriptionsStorageMockRecorder
+}
+
+// MockISubscriptionsStorageMockRecorder is the mock recorder for MockISubscriptionsStorage.
+type MockISubscriptionsStorageMockRecorder struct {
+	mock *MockISubscriptionsStorage
+}
+
+// NewMockISubscriptionsStorage creates a new mock instance.
+func NewMockISubscriptionsStorage(ctrl *gomock.Controller) *MockISubscriptionsStorage {
+	mock := &MockISubscriptionsStorage{ctrl: ctrl}
+	mock.recorder = &MockISubscriptionsStorageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockISubscriptionsStorage) EXPECT() *MockISubscriptionsStorageMockRecorder {
+	return m.recorder
+}
+
+// AddSubscription mocks base method.
+func (m *MockISubscriptionsStorage) AddSubscription(arg0 *datastruct.CreateSubscriptionRequest) (*datastruct.CreateSubscriptionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddSubscription", arg0)
+	ret0, _ := ret[0].(*datastruct.CreateSubscriptionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddSubscription indicates an expected call of AddSubscription.
+func (mr *MockISubscriptionsStorageMockRecorder) AddSubscription(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSubscription", reflect.TypeOf((*MockISubscriptionsStorage)(nil).AddSubscription), arg0)
+}
+
+// CalculateSubscriptionsPrice mocks base method.
+func (m *MockISubscriptionsStorage) CalculateSubscriptionsPrice(arg0 *datastruct.CalculateSubscriptionsPriceRequest) (*datastruct.CalculateSubscriptionsPriceResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CalculateSubscriptionsPrice", arg0)
+	ret0, _ := ret[0].(*datastruct.CalculateSubscriptionsPriceResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CalculateSubscriptionsPrice indicates an expected call of CalculateSubscriptionsPrice.
+func (mr *MockISubscriptionsStorageMockRecorder) CalculateSubscriptionsPrice(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateSubscriptionsPrice", reflect.TypeOf((*MockISubscriptionsStorage)(nil).CalculateSubscriptionsPrice), arg0)
+}
+
+// DeleteSubscription mocks base method.
+func (m *MockISubscriptionsStorage) DeleteSubscription(arg0 *datastruct.DeleteSubscriptionRequest) (*datastruct.DeleteSubscriptionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSubscription", arg0)
+	ret0, _ := ret[0].(*datastruct.DeleteSubscriptionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSubscription indicates an expected call of DeleteSubscription.
+func (mr *MockISubscriptionsStorageMockRecorder) DeleteSubscription(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubscription", reflect.TypeOf((*MockISubscriptionsStorage)(nil).DeleteSubscription), arg0)
+}
+
+// GetSubscription mocks base method.
+func (m *MockISubscriptionsStorage) GetSubscription(arg0 *datastruct.GetSubscriptionRequest) (*datastruct.GetSubscriptionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscription", arg0)
+	ret0, _ := ret[0].(*datastruct.GetSubscriptionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscription indicates an expected call of GetSubscription.
+func (mr *MockISubscriptionsStorageMockRecorder) GetSubscription(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockISubscriptionsStorage)(nil).GetSubscription), arg0)
+}
+
+// ListSubscriptions mocks base method.
+func (m *MockISubscriptionsStorage) ListSubscriptions(arg0 *datastruct.ListSubscriptionsRequest) (*datastruct.ListSubscriptionsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSubscriptions", arg0)
+	ret0, _ := ret[0].(*datastruct.ListSubscriptionsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSubscriptions indicates an expected call of ListSubscriptions.
+func (mr *MockISubscriptionsStorageMockRecorder) ListSubscriptions(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubscriptions", reflect.TypeOf((*MockISubscriptionsStorage)(nil).ListSubscriptions), arg0)
+}
+
+// UpdateSubscription mocks base method.
+func (m *MockISubscriptionsStorage) UpdateSubscription(arg0 *datastruct.UpdateSubscriptionRequest) (*datastruct.UpdateSubscriptionResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSubscription", arg0)
+	ret0, _ := ret[0].(*datastruct.UpdateSubscriptionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateSubscription indicates an expected call of UpdateSubscription.
+func (mr *MockISubscriptionsStorageMockRecorder) UpdateSubscription(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSubscription", reflect.TypeOf((*MockISubscriptionsStorage)(nil).UpdateSubscription), arg0)
 }

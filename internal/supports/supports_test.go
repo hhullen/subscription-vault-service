@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -13,36 +14,54 @@ const (
 	testKey = "support_test"
 )
 
-// func TestArgonHash(t *testing.T) {
-// 	t.Parallel()
+func TestParseDate(t *testing.T) {
+	t.Parallel()
 
-// 	t.Run("Hash", func(t *testing.T) {
-// 		require.NotPanics(t, func() {
-// 			hash := ArgonHash("str")
-// 			require.NotEmpty(t, hash)
-// 		})
-// 	})
+	t.Run("now", func(t *testing.T) {
+		t.Parallel()
+		tm, err := ParseDate("now")
+		require.NotNil(t, tm)
+		require.Nil(t, err)
+	})
 
-// 	t.Run("Check Ok", func(t *testing.T) {
-// 		hash := ArgonHash("str")
-// 		is, err := IsStringArgonHash("str", hash)
-// 		require.Nil(t, err)
-// 		require.True(t, is)
-// 	})
+	t.Run("-months", func(t *testing.T) {
+		t.Parallel()
+		tm, err := ParseDate("-13")
 
-// 	t.Run("Check Error", func(t *testing.T) {
-// 		is, err := IsStringArgonHash("str", "wrong hash")
-// 		require.NotNil(t, err)
-// 		require.False(t, is)
-// 	})
+		tb := time.Now().AddDate(0, 12, 0)
 
-// 	t.Run("Check False", func(t *testing.T) {
-// 		hash := ArgonHash("str")
-// 		is, err := IsStringArgonHash("another str", hash)
-// 		require.Nil(t, err)
-// 		require.False(t, is)
-// 	})
-// }
+		require.True(t, tm.Before(tb))
+		require.NotNil(t, tm)
+		require.Nil(t, err)
+	})
+
+	t.Run("parse formats", func(t *testing.T) {
+		t.Parallel()
+
+		for _, tf := range dateFormats {
+			tm, err := ParseDate(tf)
+			require.NotNil(t, tm)
+			require.Nil(t, err)
+
+		}
+	})
+
+	t.Run("incorrect value", func(t *testing.T) {
+		t.Parallel()
+
+		tm, err := ParseDate("10--5")
+		require.NotNil(t, err)
+		require.Equal(t, tm, time.Time{})
+	})
+
+	t.Run("incorrect date", func(t *testing.T) {
+		t.Parallel()
+
+		tm, err := ParseDate("1998-20.02")
+		require.NotNil(t, err)
+		require.Equal(t, tm, time.Time{})
+	})
+}
 
 func TestConcat(t *testing.T) {
 	t.Parallel()
@@ -96,36 +115,3 @@ func TestMakeKVMessagesJSON(t *testing.T) {
 	_, exists := data["KeyNoVal"]
 	require.False(t, exists)
 }
-
-// func TestFNV1Hash(t *testing.T) {
-// 	t.Parallel()
-
-// 	v := FNV1Hash([]byte("str"))
-// 	require.True(t, v != "")
-// }
-
-// func TestTextPatches(t *testing.T) {
-// 	t.Parallel()
-
-// 	t.Run("Ok", func(t *testing.T) {
-// 		t.Parallel()
-// 		text1 := "todo"
-// 		text2 := "in progress"
-// 		textPatch := MakePatchFromTexts(text1, text2)
-// 		patchedText, err := ApplyPatchToText(text1, textPatch)
-// 		require.Nil(t, err)
-// 		require.Equal(t, text2, patchedText)
-// 	})
-
-// 	t.Run("error", func(t *testing.T) {
-// 		t.Parallel()
-// 		text1 := "todo"
-// 		text2 := "in progress"
-// 		textPatch := MakePatchFromTexts(text1, text2)
-
-// 		editedText1 := "something wrong"
-
-// 		_, err := ApplyPatchToText(editedText1, textPatch)
-// 		require.NotNil(t, err)
-// 	})
-// }
