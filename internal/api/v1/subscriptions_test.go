@@ -42,7 +42,7 @@ func TestCreateSubscription(t *testing.T) {
 		})
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 
 		r := httptest.NewRequest(http.MethodPost, "/test", bytes.NewReader(buf.Bytes()))
 		w := httptest.NewRecorder()
@@ -66,7 +66,7 @@ func TestCreateSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodPost, "/test", bytes.NewReader(body))
@@ -104,7 +104,7 @@ func TestCreateSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodPost, "/test", bytes.NewReader(body))
@@ -233,7 +233,7 @@ func TestUpdateSubscription(t *testing.T) {
 		})
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 
 		r := httptest.NewRequest(http.MethodPatch, "/test", bytes.NewReader(buf.Bytes()))
 		w := httptest.NewRecorder()
@@ -257,7 +257,7 @@ func TestUpdateSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodPatch, "/test", bytes.NewReader(body))
@@ -295,7 +295,7 @@ func TestUpdateSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodPatch, "/test", bytes.NewReader(body))
@@ -331,7 +331,7 @@ func TestDeleteSubscription(t *testing.T) {
 		})
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 
 		r := httptest.NewRequest(http.MethodDelete, "/test", bytes.NewReader(buf.Bytes()))
 		w := httptest.NewRecorder()
@@ -355,7 +355,7 @@ func TestDeleteSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodDelete, "/test", bytes.NewReader(body))
@@ -386,7 +386,7 @@ func TestDeleteSubscription(t *testing.T) {
 		ta.loggerMock.EXPECT().ErrorKV(gomock.Any(), gomock.All())
 
 		var buf bytes.Buffer
-		json.NewEncoder(&buf).Encode(&reqS)
+		_ = json.NewEncoder(&buf).Encode(&reqS)
 		body := buf.Bytes()
 
 		r := httptest.NewRequest(http.MethodDelete, "/test", bytes.NewReader(body))

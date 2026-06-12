@@ -68,7 +68,9 @@ func ReadSecretFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 
 	secret := ""
 	_, err = fmt.Fscan(f, &secret)

@@ -145,9 +145,6 @@ coverage-html: $(COVERAGE_FILE)
 unit-test:
 	go test -v -short ./internal/...
 
-integration-test:
-	go test -v ./tests/integration/...
-
 clean-go-cache:
 	go clean -cache -modcache
 	go env -w GOPROXY=https://proxy.golang.org,direct

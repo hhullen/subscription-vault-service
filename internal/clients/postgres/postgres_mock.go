@@ -37,19 +37,93 @@ func (m *MockIQuerier) EXPECT() *MockIQuerierMockRecorder {
 	return m.recorder
 }
 
-// CreateSubscription mocks base method.
-func (m *MockIQuerier) CreateSubscription(ctx context.Context, arg sqlc.CreateSubscriptionParams) (uuid.UUID, error) {
+// CalculateSubscriptionsPrice mocks base method.
+func (m *MockIQuerier) CalculateSubscriptionsPrice(ctx context.Context, arg sqlc.CalculateSubscriptionsPriceParams) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSubscription", ctx, arg)
-	ret0, _ := ret[0].(uuid.UUID)
+	ret := m.ctrl.Call(m, "CalculateSubscriptionsPrice", ctx, arg)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
+}
+
+// CalculateSubscriptionsPrice indicates an expected call of CalculateSubscriptionsPrice.
+func (mr *MockIQuerierMockRecorder) CalculateSubscriptionsPrice(ctx, arg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateSubscriptionsPrice", reflect.TypeOf((*MockIQuerier)(nil).CalculateSubscriptionsPrice), ctx, arg)
+}
+
+// CreateSubscription mocks base method.
+func (m *MockIQuerier) CreateSubscription(ctx context.Context, arg sqlc.CreateSubscriptionParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSubscription", ctx, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateSubscription indicates an expected call of CreateSubscription.
 func (mr *MockIQuerierMockRecorder) CreateSubscription(ctx, arg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSubscription", reflect.TypeOf((*MockIQuerier)(nil).CreateSubscription), ctx, arg)
+}
+
+// DeleteSubscription mocks base method.
+func (m *MockIQuerier) DeleteSubscription(ctx context.Context, arg sqlc.DeleteSubscriptionParams) (sql.Result, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSubscription", ctx, arg)
+	ret0, _ := ret[0].(sql.Result)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteSubscription indicates an expected call of DeleteSubscription.
+func (mr *MockIQuerierMockRecorder) DeleteSubscription(ctx, arg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubscription", reflect.TypeOf((*MockIQuerier)(nil).DeleteSubscription), ctx, arg)
+}
+
+// GetSubscription mocks base method.
+func (m *MockIQuerier) GetSubscription(ctx context.Context, arg sqlc.GetSubscriptionParams) (sqlc.GetSubscriptionRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscription", ctx, arg)
+	ret0, _ := ret[0].(sqlc.GetSubscriptionRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscription indicates an expected call of GetSubscription.
+func (mr *MockIQuerierMockRecorder) GetSubscription(ctx, arg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockIQuerier)(nil).GetSubscription), ctx, arg)
+}
+
+// ListSubscriptions mocks base method.
+func (m *MockIQuerier) ListSubscriptions(ctx context.Context, userUid uuid.UUID) ([]sqlc.ListSubscriptionsRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSubscriptions", ctx, userUid)
+	ret0, _ := ret[0].([]sqlc.ListSubscriptionsRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSubscriptions indicates an expected call of ListSubscriptions.
+func (mr *MockIQuerierMockRecorder) ListSubscriptions(ctx, userUid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubscriptions", reflect.TypeOf((*MockIQuerier)(nil).ListSubscriptions), ctx, userUid)
+}
+
+// UpdateSubscription mocks base method.
+func (m *MockIQuerier) UpdateSubscription(ctx context.Context, arg sqlc.UpdateSubscriptionParams) (sql.Result, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSubscription", ctx, arg)
+	ret0, _ := ret[0].(sql.Result)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateSubscription indicates an expected call of UpdateSubscription.
+func (mr *MockIQuerierMockRecorder) UpdateSubscription(ctx, arg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSubscription", reflect.TypeOf((*MockIQuerier)(nil).UpdateSubscription), ctx, arg)
 }
 
 // MockIDB is a mock of IDB interface.
